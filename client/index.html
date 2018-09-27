@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Shop Homepage - Start Bootstrap Template</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+
+<body>
+
+  <div id="app">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Xwitter</a>
+
+        <div class="header-right" v-if="!isLogin">
+          <input type="text" placeholder="type username / email" v-model="useremail">
+          <input type="password" placeholder="password" v-model="password">
+          <button class="btn-info" v-on:click="signin">Login</button>
+        </div>
+        <div class="header-right" v-else>
+          <button class="btn-danger" v-on:click="signout">Logout</button>
+        </div>
+
+    </nav>
+
+    <!-- Error -->
+    <div class="show-error" v-if="errors">
+      <div class="alert alert-danger" v-for="error in errors">
+        {{ error }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="show-success" v-if="success">
+      <div class="alert alert-success">
+        {{ success }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="twPc-div" v-if="isLogin">
+            <a class="twPc-bg twPc-block bg-info"></a>
+            <div>
+              <a title="Mert S. Kaplan" href="https://twitter.com/mertskaplan" class="twPc-avatarLink">
+                <img alt="Mert S. Kaplan" src="https://mertskaplan.com/wp-content/plugins/msk-twprofilecard/img/mertskaplan.jpg"
+                  class="twPc-avatarImg">
+              </a>
+              <div class="twPc-divUser">
+                <div class="twPc-divName">
+                  <a href="#"> {{name}} </a>
+                </div>
+                <span>
+                  <a href="#">@<span> {{username}} </span></a>
+                </span>
+              </div>
+
+              <div class="twPc-divStats">
+                <ul class="twPc-Arrange">
+                  <li class="twPc-ArrangeSizeFit">
+                    <a href="https://twitter.com/mertskaplan" title="9.840 Tweet">
+                      <span class="twPc-StatLabel twPc-block">Tweets</span>
+                      <span class="twPc-StatValue"> {{userTweet}} </span>
+                    </a>
+                  </li>
+                  <li class="twPc-ArrangeSizeFit">
+                    <a href="https://twitter.com/mertskaplan/following" title="885 Following">
+                      <span class="twPc-StatLabel twPc-block">Following</span>
+                      <span class="twPc-StatValue"> {{follows.length}} </span>
+                    </a>
+                  </li>
+                  <li class="twPc-ArrangeSizeFit">
+                    <a href="https://twitter.com/mertskaplan/followers" title="1.810 Followers">
+                      <span class="twPc-StatLabel twPc-block">Followers</span>
+                      <span class="twPc-StatValue"> {{followers.length}} </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search -->
+          <div class="card  mb-3" style="max-width: 18rem;" v-if="isLogin">
+            <div class="card-body">
+              <input type="text" placeholder="Search...">
+              <button class="btn-info">Search</button>
+            </div>
+          </div>
+
+          <!-- Recently Followed -->
+          <div class="card  mb-3" style="max-width: 18rem;" v-if="isLogin">
+            <div class="card-body">
+              <h5 class="card-title">Recently Followed</h5>
+
+              <ul id="recently-followed" v-if="followers.length > 0">
+                <li>
+                  LIST FOLLOWS YOU
+                </li>
+              </ul>
+
+              <ul id="recently-followed" v-else>
+                <li>
+                  NOT HAVE FOLLOWERS
+                </li>
+              </ul>
+
+            </div>
+          </div>
+
+        </div>
+        <!-- /.col-lg-3 -->
+
+        <div class="col-lg-6">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 mb-12 form-horizontal" v-if="isLogin">
+              <div class="form-group">
+                <textarea class="form-control" placeholder="What's happening?" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <button class="btn-info">Post</button>
+              </div>
+            </div>
+          </div>
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 timeline-wrapper" v-for="tweet in tweets">
+              <div class="media ">
+                <img class="d-flex mr-3 rounded-circle" src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260"
+                  alt="">
+                <span class="media-body twit-status">
+                  <h5 class="mt-0"> {{ tweet.userId.name }} </h5>
+                  <p> {{ tweet.userId.email }} </p>
+                  {{ tweet.title }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- /.row -->
+        </div>
+        <!-- /.col-lg-6 -->
+
+        <div class="col-lg-3">
+          <div class="card  mb-3" style="max-width: 18rem;" v-if="isLogin">
+            <div class="card-body who-to-follow">
+              <h5 class="card-title">Who to Follow <small><a href="#">Refresh</a></small></h5>
+              <ul id="recently-followed">
+                <li v-for="recomendationFollow in recomendationFollows">
+                  <div class="media">
+                    <img class="d-flex mr-3 rounded-circle" src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260"
+                      alt="">
+                    <span class="media-body twit-status">
+                      <h6 class="mt-0"> {{recomendationFollow.name}} <small>@ {{recomendationFollow.username}} </small></h6>
+                      <button class="btn btn-outline-info">Follow</button>
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /.col-lg-3 -->
+    </div>
+    <!-- /.row -->
+
+  </div>
+  <!-- /.container -->>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script src="main.js"></script>
+</body>
+
+</html>
